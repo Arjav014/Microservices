@@ -1,79 +1,52 @@
 version: "3.8"
 
 services:
-  # ========================
-  # User Service + MongoDB
-  # ========================
+  # -------------------- USER SERVICE --------------------
   user-service:
     build: ./user-service
     container_name: user-service
     ports:
-      - "1234:1234"
+      - "5000:5000"
     depends_on:
       - mongo-user-db
     environment:
+      - PORT=5000
       - MONGO_USERNAME=admin
-      - MONGO_PASSWORD=admin
+      - MONGO_PASSWORD=secret
       - MONGO_DB_NAME=userdb
-      - JWT_SECRET=mysecret123
-      - PORT=1234
-    networks:
-      - app-network
 
   mongo-user-db:
-    image: mongo:7
+    image: mongo
     container_name: mongo-user-db
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: userdb
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+      - MONGO_INITDB_DATABASE=userdb
     ports:
-      - "27017:27017"
-    volumes:
-      - mongo-user-data:/data/db
-    networks:
-      - app-network
+      - "27018:27017"
 
-  # ========================
-  # Product Service + MongoDB
-  # ========================
+  # -------------------- PRODUCT SERVICE --------------------
   product-service:
     build: ./product-service
     container_name: product-service
     ports:
-      - "5678:5678"
+      - "5001:5001"
     depends_on:
       - mongo-product-db
     environment:
+      - PORT=5001
       - MONGO_USERNAME=admin
-      - MONGO_PASSWORD=admin
+      - MONGO_PASSWORD=secret
       - MONGO_DB_NAME=productdb
-      - PORT=5678
-    networks:
-      - app-network
 
   mongo-product-db:
-    image: mongo:7
+    image: mongo
     container_name: mongo-product-db
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: productdb
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+      - MONGO_INITDB_DATABASE=productdb
     ports:
-      - "27018:27017" # avoid clash with mongo-user-db
-    volumes:
-      - mongo-product-data:/data/db
-    networks:
-      - app-network
-
-# ========================
-# Volumes & Network
-# ========================
-volumes:
-  mongo-user-data:
-  mongo-product-data:
-
-networks:
-  app-network:
+      - "27019:27017"

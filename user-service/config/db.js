@@ -5,7 +5,7 @@ const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DB_NAME } = require('../utils/conf
 
 // mongodb+srv://admin:<db_password>@cluster0.zxvoo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 
-const MONGO_URI = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo-db:27017/${MONGO_DB_NAME}?authSource=admin`;
+const MONGO_URI = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo-user-db:27017/${MONGO_DB_NAME}?authSource=admin`;
 
 const connectDB = async () => {
     try {
