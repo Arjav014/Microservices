@@ -1,52 +1,79 @@
-version: "3.8"
+version: "3.9"
 
 services:
-  # -------------------- USER SERVICE --------------------
-  user-service:
-    build: ./user-service
-    container_name: user-service
-    ports:
-      - "5000:5000"
-    depends_on:
-      - mongo-user-db
-    environment:
-      - PORT=5000
-      - MONGO_USERNAME=admin
-      - MONGO_PASSWORD=secret
-      - MONGO_DB_NAME=userdb
-
-  mongo-user-db:
-    image: mongo
-    container_name: mongo-user-db
-    restart: always
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=secret
-      - MONGO_INITDB_DATABASE=userdb
-    ports:
-      - "27018:27017"
-
-  # -------------------- PRODUCT SERVICE --------------------
+  # 🟢 PRODUCT SERVICE
   product-service:
     build: ./product-service
     container_name: product-service
     ports:
-      - "5001:5001"
+      - "5678:5678"
+    environment:
+      - PORT=5678
+      - MONGO_USERNAME=root
+      - MONGO_PASSWORD=example
+      - MONGO_DB_NAME=productDB
+      - MONGO_URI=mongodb://root:example@mongo-db:27017/productDB?authSource=admin
     depends_on:
-      - mongo-product-db
+      - mongo-db
+      - rabbitmq
+
+  # 🟢 USER SERVICE
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "5001:5001"
     environment:
       - PORT=5001
-      - MONGO_USERNAME=admin
-      - MONGO_PASSWORD=secret
-      - MONGO_DB_NAME=productdb
+      - MONGO_USERNAME=root
+      - MONGO_PASSWORD=example
+      - MONGO_DB_NAME=userDB
+      - MONGO_URI=mongodb://root:example@mongo-db:27017/userDB?authSource=admin
+    depends_on:
+      - mongo-db
+      - rabbitmq
 
-  mongo-product-db:
-    image: mongo
-    container_name: mongo-product-db
-    restart: always
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=secret
-      - MONGO_INITDB_DATABASE=productdb
+  # 🟢 ORDER SERVICE
+  order-service:
+    build: ./order-service
+    container_name: order-service
     ports:
-      - "27019:27017"
+      - "5002:5002"
+    environment:
+      - PORT=5002
+      - MONGO_USERNAME=root
+      - MONGO_PASSWORD=example
+      - MONGO_DB_NAME=orderDB
+      - MONGO_URI=mongodb://root:example@mongo-db:27017/orderDB?authSource=admin
+    depends_on:
+      - mongo-db
+      - product-service
+      - rabbitmq
+
+  # 🟢 SINGLE MONGO INSTANCE
+  mongo-db:
+    image: mongo:6
+    container_name: mongo-db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  # 🟢 RABBITMQ (Single Instance)
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # RabbitMQ protocol
+      - "15672:15672" # RabbitMQ management dashboard
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongo-data:

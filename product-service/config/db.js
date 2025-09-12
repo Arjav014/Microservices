@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_DB_NAME } = require('../utils/config');
 
-const MONGO_URI = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo-product-db:27017/${MONGO_DB_NAME}?authSource=admin`;
+const MONGO_URI = process.env.MONGO_URI;
 
 const connectDB = async () => {
   try {
