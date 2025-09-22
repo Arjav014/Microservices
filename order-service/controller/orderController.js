@@ -1,10 +1,12 @@
 const Order = require("../model/Order");
 const axios = require('axios');
 const {publishMessage} = require('../utils/rabbitMQ');
+const {sendOrderConfirmationEmail} = require('../utils/email');
 // const Product = require("../../product-service/model/Product");
 
 const placeOrder = async (req, res) => {
-    const {userId, products} = req.body;
+    const {products} = req.body;
+    const userId = req.userId;
     try {
         let totalAmount = 0;
         const orderProducts = [];
@@ -34,13 +36,30 @@ const placeOrder = async (req, res) => {
         await newOrder.save();
 
         // Publish order to RabbitMQ
-        
+
         await publishMessage('orderQueue', {
             orderId: newOrder._id,
             userId: newOrder.userId,
             products: newOrder.products,
             totalAmount: newOrder.totalAmount
         });
+
+        // Get user email and send confirmation email
+        try {
+            const userResponse = await axios.get(`http://user-service:5001/api/auth/user/${userId}`, {
+                headers: {
+                    Authorization: req.headers.authorization // Pass the token
+                }
+            });
+            const userEmail = userResponse.data.email;
+            await sendOrderConfirmationEmail(userEmail, {
+                orderId: newOrder._id,
+                totalAmount: newOrder.totalAmount
+            });
+        } catch (emailError) {
+            console.error('Error sending email:', emailError);
+            // Don't fail the order if email fails
+        }
 
         res.status(201).json({message: 'Order placed successfully...', order: newOrder});
     } catch (error) {

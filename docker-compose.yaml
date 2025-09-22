@@ -29,6 +29,7 @@ services:
       - MONGO_PASSWORD=example
       - MONGO_DB_NAME=userDB
       - MONGO_URI=mongodb://root:example@mongo-db:27017/userDB?authSource=admin
+      - JWT_SECRET=your_jwt_secret_here
     depends_on:
       - mongo-db
       - rabbitmq
@@ -45,6 +46,11 @@ services:
       - MONGO_PASSWORD=example
       - MONGO_DB_NAME=orderDB
       - MONGO_URI=mongodb://root:example@mongo-db:27017/orderDB?authSource=admin
+      - JWT_SECRET=your_jwt_secret_here
+      - EMAIL_USER=arjav2768@gmail.com
+      - EMAIL_PASS=dooo alex jatw ujry
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_PORT=587
     depends_on:
       - mongo-db
       - product-service

@@ -3,10 +3,12 @@ const router = express.Router();
 const authController = require('../controller/authController');
 const {protect, restrictTo} = require("../middlewares/authMiddleware");
 
-const { registerUser, loginUser } = authController;
+const { registerUser, loginUser, getUser } = authController;
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
+
+router.get('/user/:id', protect, getUser);
 
 router.get('/admin-dashboard', protect, restrictTo('admin'), (req, res) => {
     res.status(200).json( {
