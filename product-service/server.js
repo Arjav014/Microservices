@@ -8,6 +8,7 @@ const connectDB = require('./config/db');
 const productRoutes = require('./routes/productRoutes');
 const {connectRabbitMQ, consumeMessage} = require('./utils/rabbitMQ');
 const Product = require('./model/Product');
+const logger = require('./utils/logger');
 
 connectDB();
 
@@ -16,7 +17,7 @@ app.use(express.json());
 app.use('/api/products', productRoutes);
 
 async function processOrder(order) {
-  console.log("Product service received order:", order);
+  logger.info("Product service received order:", order);
   for(let item of order.products) {
     const product = await Product.findById(item.productId);
     if(!product) {
@@ -24,7 +25,7 @@ async function processOrder(order) {
     }
     product.stock -= item.quantity;
     await product.save();
-    console.log(`Updated stock for product ${product.name}: ${product.stock}`);
+    logger.info(`Updated stock for product ${product.name}: ${product.stock}`);
   }
 }
 
@@ -35,5 +36,5 @@ async function processOrder(order) {
 })();
 
 app.listen(PORT, () => {
-  console.log(`Product service is running on port ${PORT}`);
+  logger.info(`Product service is running on port ${PORT}`);
 });
