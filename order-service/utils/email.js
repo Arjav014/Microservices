@@ -20,9 +20,9 @@ const sendOrderConfirmationEmail = async (email, orderDetails) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully');
+        logger.info('Email sent successfully');
     } catch (error) {
-        console.error('Error sending email:', error);
+        logger.error('Error sending email:', error);
     }
 };
 

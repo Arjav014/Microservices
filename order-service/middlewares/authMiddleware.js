@@ -25,7 +25,7 @@ exports.protect = async (req, res, next) => {
         req.userId = decoded.id; // Assuming id in token
         next();
     } catch(error) {
-        console.error(error);
+        logger.error(error);
         res.status(401).json({
             message: 'Error while validating token...'
         })

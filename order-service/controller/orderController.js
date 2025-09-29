@@ -57,13 +57,13 @@ const placeOrder = async (req, res) => {
                 totalAmount: newOrder.totalAmount
             });
         } catch (emailError) {
-            console.error('Error sending email:', emailError);
+            logger.error('Error sending email:', emailError);
             // Don't fail the order if email fails
         }
 
         res.status(201).json({message: 'Order placed successfully...', order: newOrder});
     } catch (error) {
-        console.log("Error while placing order:",error);
+        logger.info("Error while placing order:",error);
         res.status(500).json({message: 'Failed to place order', error});
     }
 }
