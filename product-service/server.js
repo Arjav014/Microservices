@@ -9,6 +9,8 @@ const productRoutes = require('./routes/productRoutes');
 const {connectRabbitMQ, consumeMessage} = require('./utils/rabbitMQ');
 const Product = require('./model/Product');
 const logger = require('./utils/logger');
+// initialize redis client (best-effort)
+require('./utils/redisClient');
 
 connectDB();
 

@@ -13,9 +13,12 @@ services:
       - MONGO_PASSWORD=example
       - MONGO_DB_NAME=productDB
       - MONGO_URI=mongodb://root:example@mongo-db:27017/productDB?authSource=admin
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
       - mongo-db
       - rabbitmq
+      - redis
 
   # 🟢 USER SERVICE
   user-service:
@@ -77,6 +80,18 @@ services:
       - "15672:15672" # RabbitMQ management dashboard
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 🟢 REDIS
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
